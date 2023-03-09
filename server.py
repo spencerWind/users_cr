@@ -10,8 +10,6 @@ def home():
 
 @app.route('/user')
 def user():
-    users = User.get_all()
-    print(users)
     return render_template('/user.html')
 
 @app.route('/user/create', methods=['POST'])
@@ -22,6 +20,26 @@ def create_user():
         "email": request.form['email'],
     }
     User.save(data)
+    return redirect('/')
+
+@app.route('/user/show/<int:user_id>')
+def show(user_id):
+    user = User.get_one(user_id)
+    return render_template("show_user.html", user = user)
+
+@app.route('/user/update/<int:user_id>')
+def show_update(user_id):
+    user = User.get_one(user_id)
+    return render_template("update_user.html", user = user)
+
+@app.route('/user/update', methods=["POST"])
+def update_user():
+    User.update(request.form)
+    return redirect('/')
+
+@app.route('/user/delete/<int:user_id>')
+def delete_user(user_id):
+    User.delete(user_id)
     return redirect('/')
 
 if __name__ == '__main__':

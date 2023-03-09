@@ -1,5 +1,6 @@
 from mysqlconnection import connectToMySQL
 
+dB = 'users'
 class User:
     def __init__(self, data) -> None:
         self.id = data['id']
@@ -15,11 +16,22 @@ class User:
             SELECT *
             FROM users;
         '''
-        results = connectToMySQL('users').query_db(query)
+        results = connectToMySQL(dB).query_db(query)
         users = []
         for user in results:
             users.append(cls(user))
         return users
+    
+    @classmethod
+    def get_one(cls, user_id):
+        query = '''
+            SELECT *
+            FROM users
+            WHERE id = %(id)s;
+        '''
+        data = {'id': user_id}
+        results = connectToMySQL(dB).query_db(query, data)
+        return cls(results[0])
         
     @classmethod
     def save(cls, data):
@@ -33,4 +45,26 @@ class User:
                 NOW()
                 );
         '''
-        return connectToMySQL('users').query_db(query, data)
+        return connectToMySQL(dB).query_db(query, data)
+    
+    @classmethod
+    def update(cls, data):
+        query = '''
+            UPDATE users
+            SET 
+            first_name = %(first_name)s,
+            last_name = %(last_name)s,
+            email = %(email)s,
+            updated_at = NOW()
+            WHERE id = %(id)s;
+            '''
+        return connectToMySQL(dB).query_db(query, data)
+        
+    @classmethod
+    def delete(cls, user_id):
+        query = '''
+            DELETE FROM users
+            WHERE id = %(id)s;
+        '''
+        data = {'id': user_id}
+        return connectToMySQL(dB).query_db(query, data)
